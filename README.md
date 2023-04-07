@@ -52,7 +52,7 @@ Some of the major components of the application is being able to post, like, and
 
  ## Back End Technology
 - Python
-- SQL
+- mySQL
 - Flask
 
 ## Team Members
