@@ -59,7 +59,7 @@ class UploadFileForm(FlaskForm):
     submit = SubmitField("Upload File")
 
 
-@app.route("/")
+@app.route("/feed")
 def feed():
     return render_template("feed.html")
 
@@ -89,8 +89,8 @@ def add_user():
     return render_template('addUser.html')
 
 
-@app.route('/addPost', methods=['GET', 'POST'])
-def add_post(login_username):
+@app.route('/addPost<string:login_username>', methods=['GET', 'POST'])
+def add_post(currentUser):
     form = UploadFileForm()
     if form.validate_on_submit():
         file = form.file.data   # grabs the file
@@ -102,14 +102,6 @@ def add_post(login_username):
         directory = "static/postImageUpload"
         filepath = os.path.join(directory, filename)
 
-        # Gets the username to be attached to the post from the database
-        # mycursor = mydb.cursor()
-        # mycursor.execute("SELECT username FROM users")
-        # myresult = mycursor.fetchall()
-
-       # for row in myresult:
-       #     sql_username = (row[0])
-
         if request.method == 'POST':
             text = request.form['text']
             if not request.form['text']:
@@ -117,34 +109,39 @@ def add_post(login_username):
 
             # Posts the username, text, and file path to the sql database
             else:
-                post = AddPost(login_username, text, filepath)
+                post = AddPost(currentUser, text, filepath)
                 db.session.add(post)
                 db.session.commit()
         return "File has been uploaded."
     return render_template('addPost.html', form=form)
 
+currentUser = "tempValue"
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 
-    mycursor = mydb.cursor()
     if request.method == 'POST':
-        if not request.form['username'] or not request.form['passwords']:
-            flash('Please enter all the fields', 'error')
+        login_username = request.form['usern']
+        login_password = request.form['passw']
+        if not request.form['usern'] or not request.form['passw']:
+            flash('Please enter all fields', 'error')
+            return render_template("login.html")
+
+        mycursor = mydb.cursor()
+        global currentUser
+
+        mycursor.execute(f"SELECT * FROM users WHERE username = '{login_username}' AND passwords = '{login_password}'")
+
+        login_user = mycursor.fetchone()
+        if login_user is not None:
+            currentUser = login_username
+            return redirect(url_for('feed'))
         else:
-            # Check if any rows were returned with the inputted username
-            try:
-                mycursor.execute("SELECT username FROM users WHERE column_name = 'username'")
-            except TypeError:
-                # No rows were returned, so the value wasn't found
-                flash('Username or password not found')
-            else:
-                # Traverse through the column and print each row
-                for row in mycursor.fetchall():
-                    login_username = (row[0])
-                add_post(login_username)
-                return "Login successful"
+            flash('Account not found', 'error')
+
     return render_template("login.html")
+
 
 if __name__ == '__main__':
     app.run(port=3304, host="localhost", debug=True)
