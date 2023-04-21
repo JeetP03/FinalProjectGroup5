@@ -59,9 +59,9 @@ class UploadFileForm(FlaskForm):
     submit = SubmitField("Upload File")
 
 
-@app.route("/feed")
-def feed():
-    return render_template("feed.html")
+@app.route("/<login_username>")
+def feed(login_username):
+    return render_template('feed.html', login_username=login_username)
 
 
 @app.route("/navigation")
@@ -89,8 +89,8 @@ def add_user():
     return render_template('addUser.html')
 
 
-@app.route('/addPost<string:login_username>', methods=['GET', 'POST'])
-def add_post(currentUser):
+@app.route('/addPost/<login_username>', methods=['GET', 'POST'])
+def add_post(login_username):
     form = UploadFileForm()
     if form.validate_on_submit():
         file = form.file.data   # grabs the file
@@ -109,16 +109,14 @@ def add_post(currentUser):
 
             # Posts the username, text, and file path to the sql database
             else:
-                post = AddPost(currentUser, text, filepath)
+                post = AddPost(login_username, text, filepath)
                 db.session.add(post)
                 db.session.commit()
         return "File has been uploaded."
-    return render_template('addPost.html', form=form)
-
-currentUser = "tempValue"
+    return render_template('addPost.html', form=form, login_username=login_username)
 
 
-@app.route("/login", methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])
 def login():
 
     if request.method == 'POST':
@@ -129,17 +127,14 @@ def login():
             return render_template("login.html")
 
         mycursor = mydb.cursor()
-        global currentUser
 
         mycursor.execute(f"SELECT * FROM users WHERE username = '{login_username}' AND passwords = '{login_password}'")
 
         login_user = mycursor.fetchone()
         if login_user is not None:
-            currentUser = login_username
-            return redirect(url_for('feed'))
+            return redirect(url_for('feed', login_username=login_username))
         else:
             flash('Account not found', 'error')
-
     return render_template("login.html")
 
 
