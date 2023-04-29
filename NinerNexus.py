@@ -110,6 +110,8 @@ def add_user():
             db.session.commit()
 
             flash('User was successfully registered')
+            return redirect(url_for('login'))
+
     return render_template('addUser.html')
 
 
