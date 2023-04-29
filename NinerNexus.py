@@ -1,3 +1,5 @@
+import time
+
 from flask import render_template, request, flash, redirect, url_for, Flask
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -7,17 +9,17 @@ from wtforms import FileField, SubmitField
 from wtforms.validators import InputRequired
 import mysql.connector
 
-# database info is local to computer
+# database info is local to computer database
 DB_HOST = "localhost"
 DB_NAME = "finalproject"
 DB_USERNAME = "root"
 DB_Password = "CLTnpase123$"
 
 mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="CLTnpase123$",
-  database="finalproject"
+    host="localhost",
+    user="root",
+    password="CLTnpase123$",
+    database="finalproject"
 )
 
 database_file = f"mysql+pymysql://{DB_USERNAME}:{DB_Password}@{DB_HOST}:3306/{DB_NAME}"
@@ -61,7 +63,29 @@ class UploadFileForm(FlaskForm):
 
 @app.route("/<login_username>")
 def feed(login_username):
-    return render_template('feed.html', login_username=login_username)
+    # mycursor = mydb.cursor()
+
+    # for fetching posts
+    # mycursor.execute("SELECT * FROM posts")
+    # feed_posts = mycursor.fetchall()
+
+    feed_posts = AddPost.query.all()
+
+    # Create an empty list to hold the post data
+    posts = []
+
+    for row in feed_posts:
+        p_username = row.profile_username
+        w_text = row.written_text
+        m_location = row.media_location
+
+        # Create a dictionary to hold the post data
+        post_data = {'p_username': p_username, 'w_text': w_text, 'm_location': m_location}
+
+        # Add the post to the list
+        posts.append(post_data)
+
+    return render_template('feed.html', login_username=login_username, posts=posts)
 
 
 @app.route("/navigation")
@@ -93,14 +117,14 @@ def add_user():
 def add_post(login_username):
     form = UploadFileForm()
     if form.validate_on_submit():
-        file = form.file.data   # grabs the file
-        filename = file.filename    # gets the file name
+        file = form.file.data  # grabs the file
+        filename = file.filename  # gets the file name
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
                                secure_filename(file.filename)))  # saves the file
 
         # Stores file path for uploaded file
         directory = "static/postImageUpload"
-        filepath = os.path.join(directory, filename)
+        filepath = os.path.join(directory, filename)  # filename should not have any spaces
 
         if request.method == 'POST':
             text = request.form['text']
@@ -112,13 +136,14 @@ def add_post(login_username):
                 post = AddPost(login_username, text, filepath)
                 db.session.add(post)
                 db.session.commit()
-        return "File has been uploaded."
+
+                return redirect(url_for('feed', login_username=login_username))
+
     return render_template('addPost.html', form=form, login_username=login_username)
 
 
 @app.route("/", methods=['GET', 'POST'])
 def login():
-
     if request.method == 'POST':
         login_username = request.form['usern']
         login_password = request.form['passw']
@@ -129,8 +154,8 @@ def login():
         mycursor = mydb.cursor()
 
         mycursor.execute(f"SELECT * FROM users WHERE username = '{login_username}' AND passwords = '{login_password}'")
-
         login_user = mycursor.fetchone()
+
         if login_user is not None:
             return redirect(url_for('feed', login_username=login_username))
         else:

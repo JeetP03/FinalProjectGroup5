@@ -57,19 +57,21 @@
             </div>
             <!-----------main content--------- -->
             <div class="main content">
+               {% for post in posts %}
                 <div class="post-container">
                     <div class="user-profile">
-                        <img src="static/images/member-1.jpg" width="40", height="40">
                         <div>
-                            <medium>Alison Allison</medium>
+                            <medium>{{ post.p_username  }}</medium>
                             <small>(Public) <i class="fas da-caret-down"></i></small>
                             <span> June 24, 2023, 1:40 pm</span>
+
+                                <div class="row">
+                                </div>
+
                         </div>
                     </div>
-                    <img src="static/images/post-1.png" class="post-img">
-                    <p class="post-text">A big thank you everyone who showed up for the CCI's annual 
-                        campus cleanup. We couldn't have asked for a bigger turn out! 
-                        <a href="#">#CampusCleanup</a> <a href="#">#CCI</a></p>
+                    <img src={{ post.m_location }} class="post-img">
+                    <p class="post-text">{{ post.w_text  }}
 
                     <div class="post-row">
                         <div><img src="static/images/like.png" width="20", height="20"> 120</div>
@@ -77,6 +79,7 @@
                         <div><img src="static/images/share.png" width="20", height="20"> 20</div>
                     </div>
                 </div>
+               {% endfor %}
             </div>
             <!-----------right sidebar--------- -->
             <div class="right-sidebar">
