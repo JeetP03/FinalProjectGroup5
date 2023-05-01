@@ -12,5 +12,6 @@ CREATE TABLE posts (
     profile_username varchar(20) not null,
     written_text varchar(200) not null,
     media_location varchar(300) not null,
+    bio varchar(300) not null,
     primary key(id)
 );

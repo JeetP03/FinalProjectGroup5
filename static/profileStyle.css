@@ -1,27 +1,12 @@
-body{
-    background-color: blue;
+.gradient-custom-2 {
+background: -webkit-linear-gradient(to right, rgba(251, 194, 235, 1), rgba(166, 193, 238, 1));
 }
-.container{
-    position: absolute;
-}
-
-.card-img-top{
-    border: solid;
-    width: 80px;
-    height: 200px;
-}
-
-.prof-pic-side{
-    position:absolute;
-    height: 350px;
-    width: 350px;
-}
-
-#username{
-    margin-left: 450px;
-}
-
-
-.userPosts{
-    margin-left: 900px;
-}
+.post-container
+{
+    width: 100%;
+    background: #fff;
+    border-radius: 6px;
+    padding: 20px;
+    color: #626262;
+    margin: 20px;
+    width: 550px;

@@ -25,7 +25,7 @@
                     <input type="text" placeholder="Search">
                 </div>
                 <div class="nav-user-icon online">
-                    <h3><a href="/userProfile"><img src="static/images/profile-pic.png"></a></h3>
+                    <h3><a href="{{ url_for('user_profile',login_username=login_username) }}""><img src="static/images/profile-icon.png"></a></h3>
                 </div>   
 
             </div> 
@@ -63,7 +63,6 @@
                         <div>
                             <medium>{{ post.p_username  }}</medium>
                             <small>(Public) <i class="fas da-caret-down"></i></small>
-                            <span> June 24, 2023, 1:40 pm</span>
 
                                 <div class="row">
                                 </div>
@@ -74,9 +73,9 @@
                     <p class="post-text">{{ post.w_text  }}
 
                     <div class="post-row">
-                        <div><img src="static/images/like.png" width="20", height="20"> 120</div>
-                        <div><img src="static/images/comment.png" width="20", height="20"> 45</div>
-                        <div><img src="static/images/share.png" width="20", height="20"> 20</div>
+                        <div><img src="static/images/lik-button.png" width="20", height="20"></div>
+                        <div><img src="static/images/comment.png" width="20", height="20"></div>
+                        <div><img src="static/images/share.png" width="20", height="20"></div>
                     </div>
                 </div>
                {% endfor %}

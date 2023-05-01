@@ -37,10 +37,12 @@ class RegisterUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     passwords = db.Column(db.String(100), nullable=False)
+    bio = db.Column(db.String(100), nullable=False)
 
-    def __init__(self, username, passwords):
+    def __init__(self, username, passwords, bio):
         self.username = username
         self.passwords = passwords
+        self.bio = bio
 
 
 class AddPost(db.Model):
@@ -63,12 +65,6 @@ class UploadFileForm(FlaskForm):
 
 @app.route("/<login_username>")
 def feed(login_username):
-    # mycursor = mydb.cursor()
-
-    # for fetching posts
-    # mycursor.execute("SELECT * FROM posts")
-    # feed_posts = mycursor.fetchall()
-
     feed_posts = AddPost.query.all()
 
     # Create an empty list to hold the post data
@@ -93,18 +89,44 @@ def navigation():
     return render_template("navBar.html")
 
 
-@app.route("/userProfile")
-def user_profile():
-    return render_template("userProfile.html")
+@app.route("/userProfile/<login_username>")
+def user_profile(login_username):
+    static_url = url_for('static', filename='')
+
+    mycursor = mydb.cursor()
+    mycursor.execute(f"SELECT bio FROM users WHERE username = '{login_username}'")
+    user = mycursor.fetchone()
+    user_bio = user[0]
+
+    mycursor.execute(f"SELECT * FROM posts WHERE profile_username = '{login_username}'")
+    user_post = mycursor.fetchall()
+
+    # Create an empty list to hold the post data
+    posts = []
+    counter = 0
+
+    for row in user_post:
+        caption = row[2]
+        image_location = row[3]
+        counter = counter + 1
+
+        # Create a dictionary to hold the post data
+        post_data = {'caption': caption, 'image_location': image_location}
+
+        # Add the post to the list
+        posts.append(post_data)
+
+    return render_template("userProfile.html", login_username=login_username, user_bio=user_bio,
+                           static_url=static_url, posts=posts, counter=counter)
 
 
 @app.route('/addUser', methods=['GET', 'POST'])
 def add_user():
     if request.method == 'POST':
-        if not request.form['username'] or not request.form['passwords']:
+        if not request.form['username'] or not request.form['passwords'] or not request.form['bio']:
             flash('Please enter all the fields', 'error')
         else:
-            user = RegisterUser(request.form['username'], request.form['passwords'])
+            user = RegisterUser(request.form['username'], request.form['passwords'], request.form['bio'])
 
             db.session.add(user)
             db.session.commit()
@@ -159,6 +181,8 @@ def login():
         login_user = mycursor.fetchone()
 
         if login_user is not None:
+
+            user_profile(login_username)
             return redirect(url_for('feed', login_username=login_username))
         else:
             flash('Account not found', 'error')
