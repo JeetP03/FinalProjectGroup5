@@ -65,21 +65,17 @@
                 <div class="p-4" style="background-color: #f8f9fa;">
                   <p class="font-italic mb-1">{{ user_bio }}</p>
                 </div>
+
               </div>
+
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <p class="lead fw-normal mb-0">Recent Posts</p>
               </div>
               <div class="row g-2">
-                <div class="col mb-2">
-                  <img src="images/fretStat.png"
-                    alt="image 1" class="w-100 rounded-3">
-                </div>
-                <div class="col mb-2">
-                  <img src="#"
-                    alt="post 2" class="w-100 rounded-3">
-                </div>
-              </div>
-               {% for post in posts %}
+
+              <!-- Code for displaying post -->
+
+              {% for post in posts %}
                 <div class="post-container">
                     <div class="user-profile">
                         <div>
@@ -97,9 +93,12 @@
                         <div><img src="static/images/lik-button.png" width="20", height="20"></div>
                         <div><img src="static/images/comment.png" width="20", height="20"></div>
                         <div><img src="static/images/share.png" width="20", height="20"></div>
+                          </div>
+               {% endfor %}
+                <!-- End code for displaying post -->
+
                     </div>
                 </div>
-               {% endfor %}
             </div>
                 </div>
               </div>
