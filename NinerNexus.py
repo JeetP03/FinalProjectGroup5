@@ -1,5 +1,3 @@
-import time
-
 from flask import render_template, request, flash, redirect, url_for, Flask
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -65,6 +63,7 @@ class UploadFileForm(FlaskForm):
 
 @app.route("/<login_username>")
 def feed(login_username):
+    static_url = url_for('static', filename='')
     feed_posts = AddPost.query.all()
 
     # Create an empty list to hold the post data
@@ -81,7 +80,7 @@ def feed(login_username):
         # Add the post to the list
         posts.append(post_data)
 
-    return render_template('feed.html', login_username=login_username, posts=posts)
+    return render_template('feed.html', login_username=login_username, posts=posts, static_url=static_url)
 
 
 @app.route("/navigation")
@@ -107,7 +106,8 @@ def user_profile(login_username):
 
     for row in user_post:
         caption = row[2]
-        image_location = row[3]
+        image_path = row[3]
+        image_location = image_path.replace("static/", "")
         counter = counter + 1
 
         # Create a dictionary to hold the post data
